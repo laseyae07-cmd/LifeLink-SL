@@ -1,0 +1,6 @@
+<?php
+require_once dirname(__DIR__).'/src/bootstrap.php';$sent=false;$error=null;$dev=null;
+if(request_method('POST')){Csrf::verify();$email=strtolower(trim($_POST['email']??''));$s=db()->prepare('SELECT * FROM users WHERE email=? LIMIT 1');$s->execute([$email]);$u=$s->fetch();if($u){try{$dev=(new VerificationService())->createPasswordReset($u);if($dev)$_SESSION['dev_password_reset_url']=$dev;}catch(Throwable $e){$error='The reset message could not be prepared.';}}$sent=true;}
+$pageTitle='Forgot Password';require dirname(__DIR__).'/src/templates/header.php';?>
+<div class="form-card narrow"><h1>Reset password</h1><?php if($error):?><div class="error-list"><?=e($error)?></div><?php endif;?><?php if($sent):?><div class="flash success">If that account exists, a password reset has been prepared.</div><?php if(!empty($_SESSION['dev_password_reset_url'])):?><p><a class="btn" href="<?=e((string)$_SESSION['dev_password_reset_url'])?>">Open local reset link</a></p><?php endif;?><?php else:?><form method="post"><?=Csrf::field()?><div class="field"><label>Email</label><input type="email" name="email" required></div><button class="btn">Prepare Reset Link</button></form><?php endif;?></div>
+<?php require dirname(__DIR__).'/src/templates/footer.php';?>

@@ -1,0 +1,8 @@
+{
+  "name": "lifelink-sl/platform",
+  "description": "LifeLink SL real-world blood donor coordination platform",
+  "type": "project",
+  "require": {
+    "php": ">=8.2"
+  }
+}

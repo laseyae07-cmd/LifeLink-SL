@@ -1,0 +1,6 @@
+<?php
+require_once dirname(__DIR__).'/src/bootstrap.php';$token=(string)($_GET['token']??'');$message='The verification link is invalid or expired.';$ok=false;$user=null;
+if($token!==''){$user=(new VerificationService())->verifyEmailToken($token);if($user){$ok=true;unset($_SESSION['dev_email_verify_url']);$_SESSION['pending_phone_user_id']=(int)$user['user_id'];try{$devOtp=(new VerificationService())->sendPhoneOtp(['id'=>$user['user_id'],'phone'=>$user['phone']]);if($devOtp!==null){$_SESSION['dev_phone_otp']=$devOtp;$message='Email verified. Continue to mobile verification using the local development OTP below.';}else{unset($_SESSION['dev_phone_otp']);$message='Email verified. Now verify your mobile number using the OTP sent by SMS.';}}catch(Throwable $e){$message='Email verified, but the phone OTP could not be prepared. '.$e->getMessage();}}}
+$pageTitle='Verify Email';require dirname(__DIR__).'/src/templates/header.php';?>
+<div class="response-panel"><h1><?=$ok?'Email verified':'Verification failed'?></h1><p><?=e($message)?></p><?php if($ok):?><a class="btn" href="<?=e(url('verify-phone.php'))?>">Continue to Phone Verification</a><?php else:?><a class="btn btn-outline" href="<?=e(url('login.php'))?>">Back to Sign In</a><?php endif;?></div>
+<?php require dirname(__DIR__).'/src/templates/footer.php';?>

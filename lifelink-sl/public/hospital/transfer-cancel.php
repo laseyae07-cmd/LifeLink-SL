@@ -1,0 +1,2 @@
+<?php
+require_once dirname(dirname(__DIR__)).'/src/bootstrap.php';$user=Auth::requireRole('hospital');$hospital=current_hospital($user);if(!request_method('POST'))redirect('hospital/inventory.php');Csrf::verify();$id=(int)($_POST['id']??0);$q=db()->prepare("UPDATE blood_transfer_requests SET status='cancelled' WHERE id=? AND to_hospital_id=? AND status='pending'");$q->execute([$id,(int)$hospital['id']]);if($q->rowCount())audit('transfer_cancelled','transfer',$id);flash('success','Transfer request cancelled.');redirect('hospital/inventory.php');

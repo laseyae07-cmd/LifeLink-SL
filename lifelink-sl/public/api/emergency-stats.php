@@ -1,0 +1,2 @@
+<?php
+require_once dirname(dirname(__DIR__)).'/src/bootstrap.php';$user=Auth::requireRole('hospital','admin');$id=(int)($_GET['id']??0);$svc=new EmergencyService();$e=$svc->get($id);if(!$e){http_response_code(404);exit;}if($user['role']==='hospital'){$h=current_hospital($user);if(!$h||(int)$e['hospital_id']!==(int)$h['id']){http_response_code(403);exit;}}header('Content-Type: application/json');echo json_encode(['emergency'=>['id'=>$id,'status'=>$e['status']],'stats'=>$svc->stats($id)]);
